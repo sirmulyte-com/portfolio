@@ -161,7 +161,7 @@
     </div>
 
     <script>
-    console.log('3');
+    console.log(' - ' + 'Your message here' + new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds());
         /*
          * This website implements a dynamic, hierarchical navigation system using multiple columns.
          * It reads data from a CSV file and creates a nested structure, which is then displayed
@@ -400,6 +400,31 @@
                 animateClickableItems(column);
             }
         };
+
+        // Handle horizontal scrolling
+        function transformScroll(event) {
+            if (!event.deltaY) {
+                return;
+            }
+
+            const container = document.querySelector('.container');
+            const lastColumn = document.querySelector('#column4');
+            const rect = lastColumn.getBoundingClientRect();
+            const isOverLastColumn = 
+                event.clientX > rect.left &&
+                event.clientX < rect.right &&
+                event.clientY > rect.top &&
+                event.clientY < rect.bottom;
+
+            if (isOverLastColumn) {
+                // Allow default vertical scrolling for the last column
+                return;
+            }
+
+            event.preventDefault();
+            const scrollAmount = event.deltaY * 2;
+            container.scrollLeft += scrollAmount;
+        }
 
         const container = document.querySelector('.container');
         container.addEventListener('wheel', transformScroll, { passive: false });
