@@ -401,31 +401,6 @@
             }
         };
 
-        // Handle horizontal scrolling
-        function transformScroll(event) {
-            if (!event.deltaY) {
-                return;
-            }
-
-            const container = document.querySelector('.container');
-            const lastColumn = document.querySelector('#column4');
-            const rect = lastColumn.getBoundingClientRect();
-            const isOverLastColumn = 
-                event.clientX > rect.left &&
-                event.clientX < rect.right &&
-                event.clientY > rect.top &&
-                event.clientY < rect.bottom;
-
-            if (isOverLastColumn) {
-                // Allow default vertical scrolling for the last column
-                return;
-            }
-
-            event.preventDefault();
-            const scrollAmount = event.deltaY * 2;
-            container.scrollLeft += scrollAmount;
-        }
-
         const container = document.querySelector('.container');
         container.addEventListener('wheel', transformScroll, { passive: false });
 
