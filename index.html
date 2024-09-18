@@ -162,7 +162,7 @@
     </div>
 
     <script>
-    console.log('8');
+    console.log('9');
         /*
          * This website implements a dynamic, hierarchical navigation system using multiple columns.
          * It reads data from a CSV file and creates a nested structure, which is then displayed
@@ -431,7 +431,7 @@
         container.addEventListener('wheel', transformScroll, { passive: false });
 
         // Parse the CSV file and initialize the columns
-        Papa.parse('/data-import/data.csv', {
+        Papa.parse('https://sirmulyte-com.github.io/portfolio/data-import/data.csv', {
             download: true,
             complete: function(results) {
                 const data = parseCSVWithHTML(results.data.map(row => row.join(',')).join('\n'));
