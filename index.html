@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>sirmulyte.com</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="build/airtable.browser.js"></script>
+    <script src="/airtable-fetch.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="slideFrame.css" />
+    <script src="slideFrame.min.js"></script>
+    <style>
+        @media (max-width: 1000px) {
+            body {
+                font-size: 3vh !important;
+            }
+
+            .column:last-child {
+                width: 95vw !important;
+                padding-right: 1vh !important;
+            }
+
+            .column:first-child {
+                padding-left: 1vh !important;
+            }
+
+
+        }
+
+        .inter-tight-sirmulyte {
+            font-family: "Inter Tight", sans-serif;
+            font-optical-sizing: auto;
+            font-style: normal;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: "Inter Tight", sans-serif;
+            font-size: 1.75vw;
+            font-weight: 400;
+            color: #ACA6A9;
+        }
+
+        a {
+            color: #BB9E9A;
+            pointer-events: visible;
+        }
+
+        .container {
+            display: flex;
+            height: 100%;
+            overflow-x: visible;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .column {
+            flex: 0 0 auto;
+            width: 22em;
+            height: 100%;
+            padding-top: 25vh;
+            padding-bottom: 15vh;
+            padding-right: 7.5em;
+            overflow: visible;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            box-sizing: border-box;
+            overflow-x: visible;
+        }
+
+        .column:first-child {
+            padding-left: 2em;
+        }
+
+        .column:last-child {
+            overflow-y: auto;
+            width: 30em;
+            white-space: normal;
+        }
+
+        .column-content {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .column li {
+            padding-left: 0.25em;
+            /* Italic fonts not being clipped off */
+            cursor: pointer;
+            list-style-type: none;
+            transition: all 0.3s ease;
+            overflow: visible;
+            /* Ensure that text isn't clipped */
+            white-space: normal;
+            /* Ensure text wraps correctly */
+        }
+
+        .column li.clickable {
+            margin-right: 0px;
+            /*Add margin to prevent text from getting clipped*/
+        }
+
+        .column li:hover:not(.no-hover) {
+            font-style: italic;
+            text-decoration: underline;
+        }
+
+        .grey-regular {
+            color: #ACA6A9;
+        }
+
+        .black-italic {
+            color: #594E53 !important;
+            font-style: italic !important;
+        }
+
+        .black-regular {
+            color: #594E53 !important;
+        }
+
+        .no-hover {
+            pointer-events: none;
+        }
+
+        @keyframes fadeInLine {
+            from {
+                opacity: 0;
+                transform: translateY(0px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-line {
+            display: block;
+            opacity: 0;
+        }
+
+        .fade-in-line.active {
+            animation: fadeInLine 1s ease-out forwards;
+        }
+
+        ::selection {
+            color: #BB9E9A;
+            background: #E0DFAF;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 4em;
+            margin-bottom: 4em;
+            width: 66%;
+        }
+
+        .html-content img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body data-slideframe="true">
+    <div class="container">
+        <div id="column1" class="column"></div>
+        <div id="column2" class="column"></div>
+        <div id="column3" class="column"></div>
+        <div id="column4" class="column"></div>
+    </div>
+
+    <script>
+        /* patP9jOWRFht1T02U.0a30555a995176d6f048588060ef1cbc9c0c13a33fd0ad1e70d425a5805ce27d
+         * This website implements a dynamic, hierarchical navigation system using multiple columns.
+         * It reads data from a CSV file and creates a nested structure, which is then displayed
+         * across four interactive columns. Users can click through the hierarchy, with each
+         * selection populating the next column. The last column is vertically scrollable for
+         * overflow content. Items with no further nested content are styled differently and
+         * are not interactive. The site supports horizontal scrolling for the entire container
+         * and vertical scrolling for the last column. HTML tags within the content are rendered
+         * properly, allowing for rich text formatting and embedded elements like links and images.
+         */
+
+        // Function to process treeDynamic into a hierarchy
+        const processDataFromTreeDynamic = (data) => {
+            let hierarchy = {};
+
+            data.forEach(item => {
+                const {
+                    tierOne,
+                    tierTwo,
+                    tierThree,
+                    tierFour
+                } = item;
+
+                if (tierOne && tierOne !== "---") {
+                    if (!hierarchy[tierOne]) hierarchy[tierOne] = {};
+                    if (tierTwo && tierTwo !== "---") {
+                        if (!hierarchy[tierOne][tierTwo]) hierarchy[tierOne][tierTwo] = {};
+                        if (tierThree && tierThree !== "---") {
+                            if (!hierarchy[tierOne][tierTwo][tierThree]) hierarchy[tierOne][tierTwo][
+                                tierThree
+                            ] = {};
+                            if (tierFour && tierFour !== "---") {
+                                hierarchy[tierOne][tierTwo][tierThree][tierFour] = item;
+                            }
+                        }
+                    }
+                }
+            });
+
+            console.log('Processed Hierarchy:', hierarchy); // Log the hierarchy structure
+            return hierarchy;
+        };
+
+        const populateColumn = (data, columnId, parentItem = {}) => {
+            const column = document.querySelector(`#${columnId}`);
+            column.innerHTML = ''; // Clear previous content
+
+            Object.keys(data).forEach((item) => {
+                if (!item) return;
+
+                let listItem = document.createElement("li");
+
+                // For the last column (e.g., column4), handle text and media rendering
+                if (columnId === 'column4') {
+                    listItem.classList.add('black-regular', 'no-hover');
+
+                    // Render the text content
+                    listItem.innerHTML = wrapLinesInSpans(item);
+
+                    // Check if there are media files to display
+                    if (data[item].media && data[item].media.length > 0) {
+                        data[item].media.forEach(url => {
+                            let img = document.createElement('img');
+                            img.src = url;
+                            img.classList.add('center'); // Add a class for any desired styling
+                            img.alt = 'Media content'; // Optional alt text
+                            listItem.appendChild(img); // Append the image to the list item
+                        });
+                    }
+                } else {
+                    // Handle content for other columns (e.g., column1, column2, etc.)
+                    listItem.innerHTML = item;
+                }
+
+                Object.keys(parentItem).forEach(key => {
+                    listItem.dataset[key] = parentItem[key];
+                });
+
+                let tierLevel = columnId.charAt(columnId.length - 1);
+                listItem.dataset[`tier${tierLevel}`] = item;
+
+                const hasNestedItems = Object.keys(data[item]).length !== 0;
+
+                if (hasNestedItems) {
+                    listItem.classList.add('clickable', 'grey-regular');
+                    listItem.addEventListener("click", function () {
+                        resetStyles();
+                        highlightRabbitHole(columnId, listItem);
+                        let nextColumnId = `column${parseInt(tierLevel) + 1}`;
+                        populateColumn(data[item], nextColumnId, listItem.dataset);
+                        for (let i = parseInt(tierLevel) + 2; i <= 4; i++) {
+                            document.querySelector(`#column${i}`).innerHTML = '';
+                        }
+                    });
+                } else {
+                    listItem.classList.add('grey-regular', 'no-hover');
+                }
+
+                column.appendChild(listItem);
+
+                if (columnId === 'column4') {
+                    animateLines(listItem); // Apply any animation for the text lines
+                }
+            });
+
+            if (columnId !== 'column4') {
+                animateClickableItems(column);
+            }
+        };
+
+        // Function to initialize the application with treeDynamic
+        const initializeAppFromTreeDynamic = () => {
+            try {
+                console.log('Initializing app with treeDynamic:', treeDynamic); // Debug treeDynamic content
+
+                // Process the treeDynamic array directly
+                const hierarchy = processDataFromTreeDynamic(treeDynamic);
+
+                // Populate the first column with the hierarchy data
+                populateColumn(hierarchy, 'column1');
+            } catch (error) {
+                console.error('Error processing treeDynamic:', error);
+                alert('Failed to load the data. Please try again later.');
+            }
+        };
+
+        // Call the initialization function when the DOM content is loaded
+        document.addEventListener('DOMContentLoaded', initializeAppFromTreeDynamic);
+
+        // Function to wrap lines in spans (as before)
+        const wrapLinesInSpans = (text) => {
+            // Create a temporary element to parse the HTML content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = text;
+
+            // Recursively wrap text nodes in spans
+            const wrapTextNodes = (node) => {
+                // If the node is a text node (nodeType === 3), wrap it in a span
+                if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                    const span = document.createElement('span');
+                    span.classList.add('fade-in-line');
+                    span.textContent = node.textContent;
+                    return span;
+                }
+
+                // If the node is an element, process its children recursively
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const elementClone = node.cloneNode(false); // Clone the element without children
+                    [...node.childNodes].forEach(child => {
+                        elementClone.appendChild(wrapTextNodes(child)); // Recursively wrap child nodes
+                    });
+                    return elementClone;
+                }
+
+                return node; // Return the node unchanged if it's not a text or element node
+            };
+
+            // Replace all child nodes of tempDiv with wrapped versions
+            const wrappedContent = [...tempDiv.childNodes].map(wrapTextNodes);
+            tempDiv.innerHTML = ''; // Clear tempDiv
+
+            wrappedContent.forEach(node => tempDiv.appendChild(node)); // Append wrapped content
+
+            return tempDiv.innerHTML; // Return the HTML as a string
+        };
+
+        // Function to split text into lines
+        const splitIntoLines = (text, maxChars = 50) => {
+            const words = text.split(' ');
+            let lines = [];
+            let currentLine = '';
+
+            words.forEach(word => {
+                if ((currentLine + word).length > maxChars) {
+                    if (currentLine) lines.push(currentLine.trim());
+                    currentLine = word + ' ';
+                } else {
+                    currentLine += word + ' ';
+                }
+            });
+
+            if (currentLine) lines.push(currentLine.trim());
+
+            return lines;
+        };
+
+
+        // Function to animate lines
+        const animateLines = (element) => {
+            const lines = element.querySelectorAll('.fade-in-line');
+            lines.forEach((line, index) => {
+                setTimeout(() => {
+                    line.classList.add('active');
+                }, index * 100); // Adjust timing as needed
+            });
+        };
+
+        // Highlight the selected item and its parents
+        const highlightRabbitHole = (columnId, item) => {
+            resetStyles();
+            item.classList.add('black-italic');
+            item.classList.remove('grey-regular');
+
+            let colNum = parseInt(columnId.charAt(columnId.length - 1));
+            for (let i = colNum - 1; i >= 1; i--) {
+                let prevColumn = document.querySelector(`#column${i}`);
+                let prevItems = prevColumn.querySelectorAll('li');
+
+                prevItems.forEach(prevItem => {
+                    if (prevItem.textContent === item.dataset[`tier${i}`]) {
+                        prevItem.classList.add('black-italic');
+                        prevItem.classList.remove('grey-regular');
+                    }
+                });
+            }
+        };
+
+        // Reset all items to their default style
+        const resetStyles = () => {
+            document.querySelectorAll('.column li').forEach(li => {
+                li.classList.remove('black-italic', 'black-regular');
+                li.classList.add('grey-regular');
+            });
+        };
+
+        // Animate clickable items in a column one by one
+        const animateClickableItems = (column) => {
+            const clickableItems = column.querySelectorAll('li.clickable');
+            clickableItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('black-regular');
+                    setTimeout(() => {
+                        item.classList.remove('black-regular');
+                    }, 1000); // Animate for 1 second
+                }, index * 200); // Delay each item by 200ms (adjust as needed)
+            });
+        };
+
+        // Handle horizontal scrolling
+        function transformScroll(event) {
+            if (!event.deltaY) {
+                return;
+            }
+
+            const container = document.querySelector('.container');
+            const lastColumn = document.querySelector('#column4');
+            const rect = lastColumn.getBoundingClientRect();
+            const isOverLastColumn =
+                event.clientX > rect.left &&
+                event.clientX < rect.right &&
+                event.clientY > rect.top &&
+                event.clientY < rect.bottom;
+
+            if (isOverLastColumn) {
+                // Allow default vertical scrolling for the last column
+                return;
+            }
+
+            event.preventDefault();
+            const scrollAmount = event.deltaY * 2;
+            container.scrollLeft += scrollAmount;
+        }
+
+        const container = document.querySelector('.container');
+        container.addEventListener('wheel', transformScroll, {
+            passive: false
+        });
+    </script>
+</body>
+
+</html>
