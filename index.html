@@ -177,13 +177,13 @@
 </head>
 
 <body data-slideframe="true">
-    
+
     <div class="container">
         <div id="column1" class="column"></div>
         <div id="column2" class="column"></div>
         <div id="column3" class="column"></div>
         <div id="column4" class="column">
-    </div>
+        </div>
 
     </div>
 
@@ -247,16 +247,30 @@
                     // Render the text content
                     listItem.innerHTML = wrapLinesInSpans(item);
 
-                    // Check if there are media files to display
+                    // First, check if there are media files and render images/PDFs before text
                     if (data[item].media && data[item].media.length > 0) {
-                        data[item].media.forEach(url => {
-                            let img = document.createElement('img');
-                            img.src = url;
-                            img.classList.add('center'); // Add a class for any desired styling
-                            img.alt = 'Media content'; // Optional alt text
-                            listItem.appendChild(img); // Append the image to the list item
+                        data[item].media.forEach(file => {
+                            // Check if the file is an image based on its MIME type
+                            if (file.type && file.type.startsWith('image/')) {
+                                let img = document.createElement('img');
+                                img.src = file.url;
+                                img.classList.add('center'); // Add a class for styling
+                                img.alt = 'Media content'; // Optional alt text
+                                listItem.appendChild(img); // Append the image to the list item
+                            } else if (file.type === 'application/pdf') {
+                                // Detect if the file is a PDF and create a clickable link
+                                let pdfLink = document.createElement('a');
+                                pdfLink.href = file.url;
+                                pdfLink.target = '_blank'; // Open in a new tab
+                                pdfLink.textContent = 'View PDF'; // Display text for the link
+                                pdfLink.classList.add(
+                                'pdf-link'); // Optionally, add a class for styling
+                                listItem.appendChild(
+                                pdfLink); // Append the PDF link to the list item
+                            }
                         });
                     }
+
                 } else {
                     // Handle content for other columns (e.g., column1, column2, etc.)
                     listItem.innerHTML = item;
