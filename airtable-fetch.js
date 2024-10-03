@@ -16,47 +16,51 @@ base('data-airtable').select({
 
 function fetchDynamicData(records, fetchNextPage) {
   records.forEach(record => {
+    // Log all fields to find the correct field name
+    // console.log('Record Fields:', record.fields);
+    // Access the correct field name (replace 'Attachments' with your actual field name)
+    let mediaFiles = record.get('media'); // Adjust field name based on your log
 
-      // Access the correct field name (replace 'Attachments' with your actual field name)
-      let mediaFiles = record.get('media'); // Adjust field name based on your log
+    // Check if mediaFiles exists and is not empty
+    if (mediaFiles && mediaFiles.length > 0) {
+      // Map through the media files to extract URLs and MIME types
+        let media = mediaFiles.map(file => ({
+          url: file.url,
+          type: file.type // MIME type (e.g., "image/jpeg", "application/pdf")
+        }));
 
-      // Check if mediaFiles exists and is not empty
-      if (mediaFiles && mediaFiles.length > 0) {
-          // Map through the media files and extract URLs
-          let mediaUrls = mediaFiles.map(file => file.url);
-          console.log('Mapped Media URLs:', mediaUrls); // Log the mapped media URLs
-
-          // Push the data into treeDynamic
-          treeDynamic.push({
-              'Order': record.get('Order'),
-              'tierOne': record.get('tierOne'),
-              'tierTwo': record.get('tierTwo'),
-              'tierThree': record.get('tierThree'),
-              'tierFour': record.get('tierFour'),
-              'media': mediaUrls // Ensure media URLs are stored correctly
-          });
-      } else {
-          treeDynamic.push({
-              'Order': record.get('Order'),
-              'tierOne': record.get('tierOne'),
-              'tierTwo': record.get('tierTwo'),
-              'tierThree': record.get('tierThree'),
-              'tierFour': record.get('tierFour'),
-              'media': [] // Store an empty array if no media
-          });
-      }
+      // Push the data into treeDynamic
+      treeDynamic.push({
+        'Order': record.get('Order'),
+        'tierOne': record.get('tierOne'),
+        'tierTwo': record.get('tierTwo'),
+        'tierThree': record.get('tierThree'),
+        'tierFour': record.get('tierFour'),
+        'media': media // Ensure media URLs are stored correctly
+      });
+    } else {
+      treeDynamic.push({
+        'Order': record.get('Order'),
+        'tierOne': record.get('tierOne'),
+        'tierTwo': record.get('tierTwo'),
+        'tierThree': record.get('tierThree'),
+        'tierFour': record.get('tierFour'),
+        'media': [] // Store an empty array if no media
+      });
+    }
   });
 
   fetchNextPage(); // Fetch the next set of records
 
   if (treeDynamic.length > 0) {
-      console.log('airtable-fetch.js | treeDynamic:', treeDynamic); // Log the final treeDynamic structure
-      initializeAppFromTreeDynamic(); // Call initialization once data is fully loaded
+    console.log('airtable-fetch.js | treeDynamic:', treeDynamic); // Log the final treeDynamic structure
+    initializeAppFromTreeDynamic(); // Call initialization once data is fully loaded
   }
 }
+
 function handleAirtableError(err) {
   if (err) {
-      console.error("Error fetching data from Airtable:", err);
-      return;
+    console.error("Error fetching data from Airtable:", err);
+    return;
   }
 }
