@@ -57,8 +57,9 @@
             white-space: nowrap; /* Prevent links from breaking into new lines */
         }
 
-        br {
-            display: inline; /* Treat <br> as inline content */
+        .preserve-line-breaks {
+            white-space: pre-wrap; /* Preserves line breaks and allows wrapping */
+            word-wrap: break-word; /* Ensures long words wrap */
         }
 
         .container {
@@ -245,6 +246,13 @@
 
                     // Render the text content
                     listItem.innerHTML = wrapLinesInSpans(item);
+
+                        // Add the content with preserved line breaks
+                        const contentContainer = document.createElement('div');
+                        contentContainer.className = 'preserve-line-breaks';
+                        contentContainer.textContent = item; // Use textContent to preserve formatting
+
+                         listItem.appendChild(contentContainer); // Append formatted content
 
                     // First, check if there are media files and render images/PDFs before text
                     if (data[item].media && data[item].media.length > 0) {
