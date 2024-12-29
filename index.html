@@ -176,7 +176,33 @@
             return hierarchy;
         };
 
-        const populateColumn = (data, columnId, parentItem = {}) => {
+        const wrapLinesInSpans = (element) => {
+    const textNodes = [];
+    
+    // Function to recursively find text nodes
+    const findTextNodes = (node) => {
+        if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+            textNodes.push(node);
+        } else {
+            node.childNodes.forEach(findTextNodes);
+        }
+    };
+    
+    // Find all text nodes
+    findTextNodes(element);
+    
+    // Wrap each text node in a span with fade-in-line class
+    textNodes.forEach(textNode => {
+        if (textNode.parentNode) {
+            const span = document.createElement('span');
+            span.className = 'fade-in-line';
+            span.textContent = textNode.textContent;
+            textNode.parentNode.replaceChild(span, textNode);
+        }
+    });
+};
+
+const populateColumn = (data, columnId, parentItem = {}) => {
             const column = document.querySelector(`#${columnId}`);
             column.innerHTML = '';
 
@@ -205,6 +231,9 @@
                     
                     contentContainer.innerHTML = tempDiv.innerHTML;
                     listItem.appendChild(contentContainer);
+                    
+                    // Apply the line animation wrapping after the content is added
+                    wrapLinesInSpans(contentContainer);
 
                     // Handle media files
                     if (data[item].media && data[item].media.length > 0) {
