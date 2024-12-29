@@ -44,9 +44,6 @@
             padding: 0;
             height: 100%;
             overflow: hidden;
-        }
-
-        body {
             font-family: "Inter Tight", sans-serif;
             font-size: 1.75vw;
             font-weight: 400;
@@ -56,6 +53,12 @@
         a {
             color: #BB9E9A;
             pointer-events: visible;
+            display: inline; /* Ensure links are inline */
+            white-space: nowrap; /* Prevent links from breaking into new lines */
+        }
+
+        br {
+            display: inline; /* Treat <br> as inline content */
         }
 
         .container {
