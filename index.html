@@ -50,10 +50,7 @@
         }
 
         .preserve-line-breaks br {
-            line-height: 0.5;
-            content: "";
-            margin: 0.1em 0;
-            display: block;
+            margin: 0.3em 0;
         }
 
         .container {
@@ -209,7 +206,21 @@
     });
 };
 
-const populateColumn = (data, columnId, parentItem = {}) => {
+const attachSlideFrameToLinks = () => {
+            const links = document.querySelectorAll('a[href]');
+            links.forEach(link => {
+                // Only attach to links that don't already have slideframe
+                if (!link.hasAttribute('data-slideframe')) {
+                    link.setAttribute('data-slideframe', 'true');
+                }
+            });
+            // Reinitialize SlideFrame
+            if (window.SlideFrame) {
+                window.SlideFrame.init();
+            }
+        };
+
+        const populateColumn = (data, columnId, parentItem = {}) => {
             const column = document.querySelector(`#${columnId}`);
             column.innerHTML = '';
 
@@ -299,6 +310,9 @@ const populateColumn = (data, columnId, parentItem = {}) => {
             if (columnId !== 'column4') {
                 animateClickableItems(column);
             }
+            
+            // Attach SlideFrame to any new links
+            attachSlideFrameToLinks();
         };
 
         const initializeAppFromTreeDynamic = () => {
