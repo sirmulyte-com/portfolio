@@ -206,20 +206,6 @@
     });
 };
 
-const attachSlideFrameToLinks = () => {
-            const links = document.querySelectorAll('a[href]');
-            links.forEach(link => {
-                // Only attach to links that don't already have slideframe
-                if (!link.hasAttribute('data-slideframe')) {
-                    link.setAttribute('data-slideframe', 'true');
-                }
-            });
-            // Reinitialize SlideFrame
-            if (window.SlideFrame) {
-                window.SlideFrame.init();
-            }
-        };
-
         const populateColumn = (data, columnId, parentItem = {}) => {
             const column = document.querySelector(`#${columnId}`);
             column.innerHTML = '';
