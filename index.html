@@ -32,16 +32,17 @@
             height: 100%;
             overflow: hidden;
             font-family: "Inter Tight", sans-serif;
-            font-size: 1.75vw;
-            font-weight: 400;
-            color: #ACA6A9;
+            font-size: 1.2vw;
+            font-weight: 300;
+            background-color: #F2EEEB; /*Background colour */
         }
 
         a {
-            color: #BB9E9A;
+            color: #4852de; /* External Link colour */
             pointer-events: visible;
             display: inline;
-            white-space: nowrap;
+            /* white-space: nowrap; */
+            word-break: break-word;
         }
 
         .preserve-line-breaks {
@@ -62,11 +63,11 @@
 
         .column {
             flex: 0 0 auto;
-            width: 22em;
+            width: 24em; /* 28em OG */
             height: 100%;
             padding-top: 25vh;
             padding-bottom: 15vh;
-            padding-right: 7.5em;
+            padding-right: 4em; /* 7.5 OG */
             overflow-x: hidden;
             overflow-y: hidden;
             box-sizing: border-box;
@@ -78,7 +79,7 @@
 
         .column:last-child {
             overflow-y: auto;
-            width: 30em;
+            width: 34em;
             white-space: normal;
         }
 
@@ -91,22 +92,46 @@
             white-space: normal;
         }
 
-        .column li:hover:not(.no-hover) {
+        /* .column li:hover:not(.no-hover) {
             font-style: italic;
             padding-left: 0.5em;
+        } */
+
+        /* Completely disable hover effects in column4 */
+        #column4 * {
+            pointer-events: none !important; /* Prevent hover interactions */
         }
 
-        .grey-regular {
-            color: #ACA6A9;
+        /* But allow links to still work */
+        #column4 a {
+            pointer-events: auto !important;
         }
 
-        .black-italic {
-            color: #594E53 !important;
-            font-style: italic !important;
+
+        .body-text {
+            color: #ACA6A9; /* Default Text colour*/
         }
 
-        .black-regular {
-            color: #594E53 !important;
+        .clickable {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clickable.body-text {
+            color: #8488d7; /* Items that can be clicked but are not activated */
+        }
+
+        .clickable.body-text:hover {
+            color: #4852de; /* Items when they are on hover */
+            padding-left: 0.5em; /* (w/o bounce value is -0.5em, w/ bounce 0.5em) )*/
+        }
+
+        .activated-item {
+            color: #4852de !important; /* Items clicked on already */
+        }
+
+        .temporary-highlight {
+            color: #4852de !important; /* When it lights up animation wise */
         }
 
         .no-hover {
@@ -148,7 +173,44 @@
             max-width: 100%;
             height: auto;
         }
+
+        /**/
+        /* Base styling for clickable items (columns 1-3) */
+        .clickable.body-text {
+            color: #8488d7; /* Items that can be clicked but are not activated */
+        }
+
+        /* Hover effect ONLY for columns 1-3 */
+        #column1 .clickable.body-text:hover,
+        #column2 .clickable.body-text:hover,
+        #column3 .clickable.body-text:hover {
+            color: #4852de; /* Hover color */
+            padding-left: 0.5em; /* Bounce effect */
+        }
+
+        /* Ensure no hover effect in column4 */
+        #column4 .clickable.body-text,
+        #column4 .clickable.body-text:hover {
+            padding-left: 0 !important; /* Force no bounce */
+            /* color: inherit !important; /* Prevent color change */
+        }
+
+        /* Style for links in column4 (if they exist) */
+        #column4 a {
+            color: #4852de; /* External link color */
+            pointer-events: auto;
+            display: inline;
+            word-break: break-word;
+        }
+
+        #column4 a:hover {
+            text-decoration: underline; /* Optional: underline on hover */
+            padding-left: 0 !important; /* Ensure no bounce */
+        }
+
     </style>
+
+
 </head>
 
 <body data-slideframe="true">
@@ -216,7 +278,7 @@
                 let listItem = document.createElement("li");
 
                 if (columnId === 'column4') {
-                    listItem.classList.add('black-regular', 'no-hover');
+                    listItem.classList.add('temporary-highlight', 'no-hover');
                     
                     // Create a container for the content
                     const contentContainer = document.createElement('div');
@@ -230,7 +292,6 @@
                     const links = tempDiv.getElementsByTagName('a');
                     Array.from(links).forEach(link => {
                         link.style.display = 'inline';
-                        link.style.whiteSpace = 'nowrap';
                     });
                     
                     contentContainer.innerHTML = tempDiv.innerHTML;
@@ -272,7 +333,7 @@
                 const hasNestedItems = Object.keys(data[item]).length !== 0;
 
                 if (hasNestedItems) {
-                    listItem.classList.add('clickable', 'grey-regular');
+                    listItem.classList.add('clickable', 'body-text');
                     listItem.addEventListener("click", function () {
                         resetStyles();
                         highlightRabbitHole(columnId, listItem);
@@ -283,7 +344,7 @@
                         }
                     });
                 } else {
-                    listItem.classList.add('grey-regular', 'no-hover');
+                    listItem.classList.add('body-text', 'no-hover');
                 }
 
                 column.appendChild(listItem);
@@ -324,8 +385,8 @@
 
         const highlightRabbitHole = (columnId, item) => {
             resetStyles();
-            item.classList.add('black-italic');
-            item.classList.remove('grey-regular');
+            item.classList.add('activated-item');
+            item.classList.remove('body-text');
 
             let colNum = parseInt(columnId.charAt(columnId.length - 1));
             for (let i = colNum - 1; i >= 1; i--) {
@@ -334,8 +395,8 @@
 
                 prevItems.forEach(prevItem => {
                     if (prevItem.textContent === item.dataset[`tier${i}`]) {
-                        prevItem.classList.add('black-italic');
-                        prevItem.classList.remove('grey-regular');
+                        prevItem.classList.add('activated-item');
+                        prevItem.classList.remove('body-text');
                     }
                 });
             }
@@ -343,8 +404,8 @@
 
         const resetStyles = () => {
             document.querySelectorAll('.column li').forEach(li => {
-                li.classList.remove('black-italic', 'black-regular');
-                li.classList.add('grey-regular');
+                li.classList.remove('activated-item', 'temporary-highlight');
+                li.classList.add('body-text');
             });
         };
 
@@ -352,9 +413,9 @@
             const clickableItems = column.querySelectorAll('li.clickable');
             clickableItems.forEach((item, index) => {
                 setTimeout(() => {
-                    item.classList.add('black-regular');
+                    item.classList.add('temporary-highlight');
                     setTimeout(() => {
-                        item.classList.remove('black-regular');
+                        item.classList.remove('temporary-highlight');
                     }, 1000);
                 }, index * 200);
             });
